@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
+import 'http_service.dart';
 // import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -12,6 +13,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
+  late String username;
+  late String email;
+  late String password;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +44,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(),
                   labelText: "Username",
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    username = value;
+                  });
+                },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter a valid username";
@@ -55,6 +64,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(),
                   labelText: "Email",
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    email = value;
+                  });
+                },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter an valid email";
@@ -71,6 +85,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   labelText: "Password",
                 ),
                 obscureText: true,
+                onChanged: (value) {
+                  setState(() {
+                    password = value;
+                  });
+                },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter a password";
@@ -81,10 +100,11 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             ElevatedButton(
               style: style,
-              onPressed: () {
+              onPressed: () async {
                 if (_registerFormKey.currentState!.validate()) {
-                  print("SUCCESS");
-                  // Send API call here
+                  // Send register API call
+                  await HttpService.register(
+                      username, email, password, context);
                 }
               },
               child: const Text("Register"),

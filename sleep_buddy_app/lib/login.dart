@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy_app/http_service.dart';
 // import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,10 +12,11 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  late String email;
+  late String password;
 
   @override
   Widget build(BuildContext context) {
-    // var appState = context.watch<AppState>();
     ThemeData theme = Theme.of(context);
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: TextStyle(fontSize: 30, color: theme.colorScheme.onPrimary),
@@ -39,6 +41,11 @@ class LoginPageState extends State<LoginPage> {
                   border: OutlineInputBorder(),
                   labelText: "Email",
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    email = value;
+                  });
+                },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter an valid email";
@@ -55,6 +62,11 @@ class LoginPageState extends State<LoginPage> {
                   labelText: "Password",
                 ),
                 obscureText: true,
+                onChanged: (value) {
+                  setState(() {
+                    password = value;
+                  });
+                },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter a password";
@@ -65,10 +77,10 @@ class LoginPageState extends State<LoginPage> {
             ),
             ElevatedButton(
               style: style,
-              onPressed: () {
+              onPressed: () async {
                 if (_loginFormKey.currentState!.validate()) {
-                  print("SUCCESS");
-                  // Send API call here
+                  // Send login API call
+                  await HttpService.login(email, password, context);
                 }
               },
               child: const Text("Login"),

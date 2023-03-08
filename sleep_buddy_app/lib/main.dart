@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'login.dart';
 import 'register.dart';
@@ -22,6 +23,7 @@ class SleepBuddy extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
         home: const RegisterPage(),
+        builder: EasyLoading.init(),
       ),
     );
   }
