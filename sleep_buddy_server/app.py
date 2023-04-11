@@ -8,20 +8,20 @@ db = SQLAlchemy()
 db.init_app(app)
 
 class User(db.Model):
-    username = db.Column(db.String, primary_key=True)
-    email = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, primary_key=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
 
 @app.route("/register", methods=["POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
         email = request.form["email"]
+        name = request.form["name"]
         password = request.form["password"]
 
-        # TODO: Verify username uniquness, email format, and password
+        # TODO: Verify email format and uniqueness, and password
 
-        user = User(username=username, email=email, password=password)
+        user = User(name=name, email=email, password=password)
         try:
             db.session.add(user)
             db.session.commit()
@@ -40,6 +40,25 @@ def login():
         if not user or user.password != password:
             return jsonify(["login_error"])
         return jsonify(["login_success"])
+    
+@app.route("/get_user", methods=["POST"])
+def getUser():
+    email = request.form["email"]
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({
+            "error": "User not found",
+            "email": "",
+            "name": "",
+        })
+    return jsonify({
+        "error": "",
+        "email": user.email,
+        "name": user.name,
+    })
+
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

@@ -13,13 +13,12 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
-  late String username;
+  late String name;
   late String email;
   late String password;
 
   @override
   Widget build(BuildContext context) {
-    // var appState = context.watch<AppState>();
     ThemeData theme = Theme.of(context);
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: TextStyle(fontSize: 30, color: theme.colorScheme.onPrimary),
@@ -42,16 +41,16 @@ class _RegisterPageState extends State<RegisterPage> {
               child: TextFormField(
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: "Username",
+                  labelText: "Name",
                 ),
                 onChanged: (value) {
                   setState(() {
-                    username = value;
+                    name = value;
                   });
                 },
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return "Please enter a valid username";
+                    return "Please enter a valid name";
                   }
                   return null;
                 },
@@ -103,8 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
               onPressed: () async {
                 if (_registerFormKey.currentState!.validate()) {
                   // Send register API call
-                  await HttpService.register(
-                      username, email, password, context);
+                  await HttpService.register(name, email, password, context);
                 }
               },
               child: const Text("Register"),
