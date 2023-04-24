@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_buddy_app/http_service.dart';
+import 'package:sleep_buddy_app/survey.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -32,6 +33,7 @@ class DashboardHome extends StatefulWidget {
 }
 
 class _DashboardHomeState extends State<DashboardHome> {
+  int _selectedIndex = 0;
   User _currentUser = const User();
 
   void loadCurrentUser() async {
@@ -50,6 +52,12 @@ class _DashboardHomeState extends State<DashboardHome> {
     loadCurrentUser();
   }
 
+  void _navChange(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -58,14 +66,8 @@ class _DashboardHomeState extends State<DashboardHome> {
       padding: const EdgeInsets.all(12),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dashboard"),
-        titleTextStyle: const TextStyle(
-          fontSize: 40,
-        ),
-      ),
-      body: Column(
+    List<Widget> widgetOptions = <Widget>[
+      Column(
         children: [
           Text("Hello, ${_currentUser.name}!"),
           ElevatedButton(
@@ -77,6 +79,40 @@ class _DashboardHomeState extends State<DashboardHome> {
             child: const Text("Logout"),
           ),
         ],
+      ),
+      const Survey(),
+      Column(
+        children: const [
+          Text("Settings"),
+        ],
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Sleep Buddy"),
+        titleTextStyle: const TextStyle(
+          fontSize: 40,
+        ),
+      ),
+      body: Center(
+        child: widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.document_scanner),
+            label: "Survey",
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: "Settings"),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _navChange,
       ),
     );
   }
