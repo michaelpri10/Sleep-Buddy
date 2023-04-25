@@ -33,6 +33,7 @@ class LoginPageState extends State<LoginPage> {
         key: _loginFormKey,
         child: Column(
           children: [
+            const Image(image: AssetImage('assets/logo.png')),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(

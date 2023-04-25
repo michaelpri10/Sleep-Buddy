@@ -1,18 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_buddy_app/date_picker.dart';
+import 'package:sleep_buddy_app/http_service.dart';
 import 'package:sleep_buddy_app/radio_question.dart';
 
-class BaselineSurvey extends StatefulWidget {
-  const BaselineSurvey({super.key});
+class BaselineSurveyPage extends StatefulWidget {
+  const BaselineSurveyPage({super.key});
 
   @override
-  State<BaselineSurvey> createState() => BaselineSurveyState();
+  State<BaselineSurveyPage> createState() => BaselineSurveyState();
 }
 
-class BaselineSurveyState extends State<BaselineSurvey> {
+class BaselineSurveyState extends State<BaselineSurveyPage> {
+  User _currentUser = const User();
+
+  void loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email = (prefs.getString("current_user") ?? "");
+    User tempUser = await HttpService.getUserByEmail(email);
+
+    setState(() {
+      _currentUser = tempUser;
+    });
+  }
+
   final GlobalKey<FormState> _baselineSurveyKey = GlobalKey<FormState>();
-  final Map<String, dynamic> _formData = {};
+  final Map<String, dynamic> _formData = {
+    "start_date": DateTime.now().toString().split(" ")[0],
+    "average_sleep": -1,
+    "sleep_happiness": 3,
+    "sleep_deprived": 3,
+    "tracked_sleep": false,
+    "sleep_insights": "",
+    "drinking_days_average": -1,
+    "drugs_days_average": -1,
+    "caffeine_days_average": -1,
+    "exercise_days_average": -1,
+    "device_time_average": -1,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +80,7 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                     return null;
                   },
                   onSaved: (value) {
-                    _formData["start_date"] = value;
+                    _formData["start_date"] = value.toString().split(" ")[0];
                   },
                 ),
               ),
@@ -93,7 +125,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                 child: RatingScale(
                   question: "How often do you feel sleep deprived?",
                   onChanged: (value) {
-                    _formData["sleep_deprived"] = value;
+                    setState(() {
+                      _formData["sleep_deprived"] = value;
+                    });
                   },
                   lowest: "Rarely Ever",
                   highest: "Almost Always",
@@ -106,7 +140,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   labels: const ["Yes", "No"],
                   amount: 2,
                   onChanged: (value) {
-                    _formData["tracked_sleep"] = value;
+                    setState(() {
+                      _formData["tracked_sleep"] = value == 0 ? true : false;
+                    });
                   },
                 ),
               ),
@@ -132,7 +168,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   labels: const ["0 Days", "1-2 Days", "3-4 Days", "5+ Days"],
                   amount: 4,
                   onChanged: (value) {
-                    _formData["drinking_days_average"] = value;
+                    setState(() {
+                      _formData["drinking_days_average"] = value;
+                    });
                   },
                 ),
               ),
@@ -144,7 +182,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   labels: const ["0 Days", "1-2 Days", "3-4 Days", "5+ Days"],
                   amount: 4,
                   onChanged: (value) {
-                    _formData["drugs_days_average"] = value;
+                    setState(() {
+                      _formData["drugs_days_average"] = value;
+                    });
                   },
                 ),
               ),
@@ -156,7 +196,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   labels: const ["0 Days", "1-2 Days", "3-4 Days", "5+ Days"],
                   amount: 4,
                   onChanged: (value) {
-                    _formData["caffeine_days_average"] = value;
+                    setState(() {
+                      _formData["caffeine_days_average"] = value;
+                    });
                   },
                 ),
               ),
@@ -167,7 +209,9 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   labels: const ["0 Days", "1-2 Days", "3-4 Days", "5+ Days"],
                   amount: 4,
                   onChanged: (value) {
-                    _formData["exercise_days_average"] = value;
+                    setState(() {
+                      _formData["exercise_days_average"] = value;
+                    });
                   },
                 ),
               ),
@@ -185,14 +229,18 @@ class BaselineSurveyState extends State<BaselineSurvey> {
                   ],
                   amount: 5,
                   onChanged: (value) {
-                    _formData["device_time_average"] = value;
+                    setState(() {
+                      _formData["device_time_average"] = value;
+                    });
                   },
                 ),
               ),
               ElevatedButton(
                 style: style,
-                onPressed: () {
-                  Navigator.pop(context);
+                onPressed: () async {
+                  _baselineSurveyKey.currentState!.save();
+                  await HttpService.saveBaseline(
+                      _currentUser.email, _formData, context);
                 },
                 child: const Text("Submit"),
               ),

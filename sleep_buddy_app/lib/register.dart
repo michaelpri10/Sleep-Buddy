@@ -36,6 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
         key: _registerFormKey,
         child: Column(
           children: [
+            const Image(image: AssetImage('assets/logo.png')),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(

@@ -35,21 +35,29 @@ class DashboardHome extends StatefulWidget {
 class _DashboardHomeState extends State<DashboardHome> {
   int _selectedIndex = 0;
   User _currentUser = const User();
+  BaselineSurvey _baselineSurvey = const BaselineSurvey();
+  DailySurvey _dailySurvey = const DailySurvey();
 
-  void loadCurrentUser() async {
+  void loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email = (prefs.getString("current_user") ?? "");
     User tempUser = await HttpService.getUserByEmail(email);
+    BaselineSurvey tempBaselineSurvey =
+        await HttpService.getBaselineByEmail(email);
+    DailySurvey tempDailySurvey =
+        await HttpService.getDailyByEmailDate(email, '2023-04-25');
 
     setState(() {
       _currentUser = tempUser;
+      _baselineSurvey = tempBaselineSurvey;
+      _dailySurvey = tempDailySurvey;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    loadCurrentUser();
+    loadUserData();
   }
 
   void _navChange(int index) {
@@ -70,6 +78,8 @@ class _DashboardHomeState extends State<DashboardHome> {
       Column(
         children: [
           Text("Hello, ${_currentUser.name}!"),
+          Text("Start Date: ${_currentUser.start_date}"),
+          Text("Number of drinks: ${_dailySurvey.number_of_drinks}"),
           ElevatedButton(
             style: style,
             onPressed: () async {
@@ -99,6 +109,12 @@ class _DashboardHomeState extends State<DashboardHome> {
         child: widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          _navChange(index);
+          if (index == 0) {
+            loadUserData();
+          }
+        },
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -112,7 +128,6 @@ class _DashboardHomeState extends State<DashboardHome> {
               icon: Icon(Icons.settings), label: "Settings"),
         ],
         currentIndex: _selectedIndex,
-        onTap: _navChange,
       ),
     );
   }

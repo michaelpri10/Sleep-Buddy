@@ -25,7 +25,7 @@ class Survey extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const BaselineSurvey(),
+                      builder: (context) => const BaselineSurveyPage(),
                     ));
               },
               child: const Text("Baseline Survey"),
@@ -37,7 +37,7 @@ class Survey extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DailySurvey(),
+                    builder: (context) => const DailySurveyPage(),
                   ));
             },
             child: const Text("Daily Survey"),
